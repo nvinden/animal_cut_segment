@@ -25,6 +25,9 @@ from mrcnn.model import log
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
+gpu_devices = tf.config.experimental.list_physical_devices('GPU')
+for device in gpu_devices:
+    tf.config.experimental.set_memory_growth(device, True)
 
 ROOT_DIR = os.path.abspath(".") # Root directory of the project
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
@@ -201,6 +204,8 @@ def train(data_path, weights, epochs):
     dataset_train.load_cuts("train")
     dataset_train.prepare()
 
+    print(dataset_train.class_names)
+
     # Test dataset
     dataset_val = CutsDataset()
     dataset_val.data_path = data_path
@@ -210,7 +215,7 @@ def train(data_path, weights, epochs):
     # Load and display random samples
     #load_and_display(dataset_train)
 
-    model = load_model(weights, config)
+    model = load_model("coco", config)
 
     model.train(dataset_train, dataset_val, 
             learning_rate=config.LEARNING_RATE, 
